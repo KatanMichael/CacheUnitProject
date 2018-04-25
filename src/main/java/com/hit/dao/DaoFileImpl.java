@@ -63,6 +63,7 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 	public void save(DataModel<T> entity)
 	{
 		listOfEntitys.clear();
+		openStreams();
 		getDataFromFile();
 		listOfEntitys.add(entity);
 		writeDataToFile();
@@ -74,8 +75,8 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 	private void openStreams()
 	{
 		try {
-			inputStream = new ObjectInputStream(new FileInputStream(fileName));
 			outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
+			inputStream = new ObjectInputStream(new FileInputStream(fileName));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,6 +96,7 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 	private void getDataFromFile()
 	{
 		DataModel<T> entity;
+
 		try {
 			while ((entity = (DataModel<T>) inputStream.readObject()) != null)
 			{

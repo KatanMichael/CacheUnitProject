@@ -5,7 +5,7 @@ public class DataModel <T> implements java.io.Serializable
 	private Long id;
 	private T content;
 
-	public DataModel(java.lang.Long id, T content)
+	public DataModel(Long id, T content)
 	{
 		this.id = id;
 		this.content = content;

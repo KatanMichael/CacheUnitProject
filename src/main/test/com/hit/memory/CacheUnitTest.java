@@ -1,14 +1,19 @@
 package com.hit.memory;
 
 import com.hit.algorithm.LRUAlgoCacheImpl;
+import com.hit.dao.DaoFileImpl;
 import com.hit.dm.DataModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
-public class CacheUnitTest {
+public class CacheUnitTest
+{
 
     @Before
     public void setUp() throws Exception {
@@ -21,19 +26,46 @@ public class CacheUnitTest {
     @Test
     public void getDataModels()
     {
-        //DaoFileImpl<Integer> daoFile = new DaoFileImpl<>();
-        //DataModel<Integer> dataModel;
-        LRUAlgoCacheImpl<Long,DataModel<Integer>> lru = new LRUAlgoCacheImpl(5);
-        //CacheUnit<Integer> cacheUnit = new CacheUnit(lru,daoFile);
+       DataModel<Integer> dataModel;
+       LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(5);
+       DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
 
-        lru.putElement(new Long(1),new DataModel<>(new Long(1),new Integer(1)));
-        lru.putElement(new Long(2),new DataModel<>(new Long(2),new Integer(2)));
-        lru.putElement(new Long(3),new DataModel<>(new Long(3),new Integer(3)));
-        lru.putElement(new Long(4),new DataModel<>(new Long(4),new Integer(4)));
-        lru.putElement(new Long(5),new DataModel<>(new Long(5),new Integer(5)));
+        for (int i = 0; i < 6; i++)
+        {
+               lru.putElement((long)i,new DataModel((long)i,i));
+        }
+
+        CacheUnit<Integer> cacheUnit = new CacheUnit(lru,daoFile);
+
+        Long[] ids = {Long.valueOf(1),Long.valueOf(3),Long.valueOf(4)};
+
+        ArrayList<DataModel<Integer>> models = new ArrayList<>();
+
+        try {
+            DataModel<Integer>[] dataModels = cacheUnit.getDataModels(ids);
+
+            for (int i = 0; i < dataModels.length; i++)
+            {
+                models.add(dataModels[i]);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (DataModel data: models)
+        {
+            System.out.println(data.getId()+" "+ data.getContent());
+        }
+
+    }
+
+    @Test
+    public void justTesting()
+    {
 
 
-
-        assertEquals(true,true);
     }
 }

@@ -17,7 +17,7 @@ public class CacheUnit <T>
 	{
 		this.algoCache = algo;
 		this.dao = dao;
-
+		
 	}
 	
 	
@@ -27,18 +27,39 @@ public class CacheUnit <T>
 		ArrayList<DataModel<T>> listOfEntitys = new ArrayList<>();
 		DataModel<T> entity;
 
-		for (int i = 0; i <ids.length ; i++)
+		for (int i = 0; i < ids.length; i++)
 		{
-			entity = (DataModel<T>) dao.find(ids[i]);
-			if(entity != null)
+			DataModel<T> tempData = (DataModel<T>) algoCache.getElement(ids[i]);
+
+			if(tempData != null)
 			{
-				listOfEntitys.add(entity);
+				listOfEntitys.add(tempData);
 			}
 
 		}
 
-		DataModel<T>[] tempArr = (DataModel<T>[]) listOfEntitys.toArray();
-		return tempArr;
+		for (int i = 0; i <ids.length ; i++)
+		{
+			DataModel<T> tempData;
+			tempData = (DataModel<T>) dao.find(ids[i]);
+
+			if(tempData != null)
+			{
+				listOfEntitys.add(tempData);
+			}
+
+		}
+
+
+		DataModel<T>[] arrOfDataModels = new DataModel[listOfEntitys.size()];
+
+		for (int i = 0; i < listOfEntitys.size(); i++)
+		{
+			arrOfDataModels[i] = listOfEntitys.get(i);
+		}
+
+
+		return arrOfDataModels;
 
 	}
 
