@@ -8,8 +8,6 @@ import java.util.ArrayList;
 
 public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 {
-	private ObjectInputStream inputStream;
-	private ObjectOutputStream outputStream;
 
 	private ArrayList<DataModel<T>> listOfEntitys;
 
@@ -31,99 +29,111 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 	@Override
 	public void delete(DataModel<T> entity)
 	{
-		openStreams();
-		getDataFromFile();
 
-		listOfEntitys.remove(entity);
+		listOfEntitys.clear();
+		DataModel<T> tempModel;
 
-		writeDataToFile();
+		try
+		{
+			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName));
 
-		closeStreams();
+			boolean control = true;
+
+			while(control)
+			{
+				tempModel = (DataModel<T>) inputStream.readObject();
+				if(tempModel != null)
+				{
+					listOfEntitys.add(tempModel);
+				}else
+				{
+					control = false;
+				}
+
+			}
+
+			listOfEntitys.remove(entity);
+
+			ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
+
+			for(DataModel t: listOfEntitys)
+			{
+				outputStream.writeObject(t);
+			}
+
+
+
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+
 	}
 
 	@Override
 	public DataModel<T> find(Long id)
 	{
-		openStreams();
-		getDataFromFile();
-
-		for (int i = 0; i <listOfEntitys.size() ; i++)
+		DataModel <T> tempEntity;
+		DataModel <T> returnEntity = null;
+		try
 		{
-			if(listOfEntitys.get(i).getId() == id)
+			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName));
+
+			boolean control = true;
+			while(control)
 			{
-				return listOfEntitys.get(i);
+				DataModel<T> readObject = (DataModel<T>) inputStream.readObject();
+				tempEntity = readObject;
+				if(tempEntity != null)
+				{
+					listOfEntitys.add(tempEntity);
+				}else
+				{
+					control = false;
+				}
+
 			}
 
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
-		return null;
+		for(DataModel t: listOfEntitys)
+		{
+			if(t.getId() == id)
+			{
+				returnEntity = t;
+			}
+		}
+
+
+		return returnEntity;
 	}
 
 	@Override
 	public void save(DataModel<T> entity)
 	{
-		listOfEntitys.clear();
-		openStreams();
-		getDataFromFile();
-		listOfEntitys.add(entity);
-		writeDataToFile();
-		closeStreams();
-	}
 
-
-	/*Private Util Methods*/
-	private void openStreams()
-	{
 		try {
-			outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
-			inputStream = new ObjectInputStream(new FileInputStream(fileName));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+			ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName,true));
 
-	private void closeStreams()
-	{
-		try {
-			inputStream.close();
+			outputStream.writeObject(entity);
+
 			outputStream.close();
-		}catch (IOException exception)
+
+		} catch (IOException e)
 		{
-			exception.printStackTrace();
-		}
-	}
-
-	private void getDataFromFile()
-	{
-		DataModel<T> entity;
-
-		try {
-			while ((entity = (DataModel<T>) inputStream.readObject()) != null)
-			{
-				listOfEntitys.add(entity);
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+
 	}
 
-	private void writeDataToFile()
-	{
-		openStreams();
 
-		for (int i = 0; i < listOfEntitys.size(); i++)
-		{
-			try {
-				outputStream.writeObject(listOfEntitys.get(i));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
-	
 
 }

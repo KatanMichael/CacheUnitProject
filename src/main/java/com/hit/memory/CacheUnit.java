@@ -17,35 +17,61 @@ public class CacheUnit <T>
 	{
 		this.algoCache = algo;
 		this.dao = dao;
+
 		
 	}
 	
-	
+
 	DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
 	{
 
 		ArrayList<DataModel<T>> listOfEntitys = new ArrayList<>();
 		DataModel<T> entity;
 
-		for (int i = 0; i < ids.length; i++)
+		ArrayList<Long> arrayIds = new ArrayList<>();
+
+		ArrayList<Long> removeId = new ArrayList<>();
+
+		for(Long l: ids)
 		{
-			DataModel<T> tempData = (DataModel<T>) algoCache.getElement(ids[i]);
-
-			if(tempData != null)
-			{
-				listOfEntitys.add(tempData);
-			}
-
+			arrayIds.add(l);
 		}
 
-		for (int i = 0; i <ids.length ; i++)
+
+		for(int i =0; i < arrayIds.size(); i++)
+		{
+			entity = (DataModel<T>) algoCache.getElement(arrayIds.get(i));
+
+			if(entity != null)
+			{
+				removeId.add(arrayIds.get(i));
+				listOfEntitys.add(entity);
+			}
+		}
+
+		for(Long id: removeId)
+		{
+			arrayIds.remove(id);
+		}
+
+
+		for(Long id: arrayIds)
 		{
 			DataModel<T> tempData;
-			tempData = (DataModel<T>) dao.find(ids[i]);
+			tempData = (DataModel<T>) dao.find(id);
 
 			if(tempData != null)
 			{
+				dao.delete(id);
 				listOfEntitys.add(tempData);
+				arrayIds.remove(id);
+			}
+
+			DataModel resultObject = (DataModel) algoCache.putElement(tempData.getId(), tempData);
+
+			if(resultObject != null)
+			{
+				dao.save(resultObject);
 			}
 
 		}

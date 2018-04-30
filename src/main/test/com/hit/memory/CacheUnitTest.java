@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -26,27 +26,33 @@ public class CacheUnitTest
     @Test
     public void getDataModels()
     {
-       DataModel<Integer> dataModel;
-       LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(5);
-       DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
+        DataModel<Integer> dataModel;
+        LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
+        DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 10; i++)
         {
-               lru.putElement((long)i,new DataModel((long)i,i));
+            int integer = i;
+            //daoFile.save(new DataModel(Long.valueOf(i), integer));
         }
 
-        CacheUnit<Integer> cacheUnit = new CacheUnit(lru,daoFile);
 
-        Long[] ids = {Long.valueOf(1),Long.valueOf(3),Long.valueOf(4)};
+        for (int i = 0; i < 5; i++) {
+            lru.putElement((long) i, new DataModel((long) i, i));
+        }
 
-        ArrayList<DataModel<Integer>> models = new ArrayList<>();
+        CacheUnit<Integer> cacheUnit = new CacheUnit(lru, daoFile);
+
+
+
+        Long[] ids = {Long.valueOf(1),Long.valueOf(2),Long.valueOf(15)};
 
         try {
             DataModel<Integer>[] dataModels = cacheUnit.getDataModels(ids);
 
-            for (int i = 0; i < dataModels.length; i++)
+            for(DataModel t: dataModels)
             {
-                models.add(dataModels[i]);
+                System.out.println(t.toString());
             }
 
         } catch (ClassNotFoundException e) {
@@ -55,16 +61,21 @@ public class CacheUnitTest
             e.printStackTrace();
         }
 
-        for (DataModel data: models)
-        {
-            System.out.println(data.getId()+" "+ data.getContent());
-        }
+
 
     }
 
     @Test
     public void justTesting()
     {
+        try
+        {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("out.txt",true));
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("out.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
 
     }
