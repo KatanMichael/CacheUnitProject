@@ -1,5 +1,7 @@
 package com.hit.dao;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hit.dm.DataModel;
 
 import java.io.*;
@@ -10,129 +12,237 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 {
 
 	private ArrayList<DataModel<T>> listOfEntitys;
-
-	private String fileName;
+	private static ObjectOutputStream outputStream;
+	private static ObjectInputStream inputStream;
+	private Gson gson;
+	private static String fileName;
 
 	public DaoFileImpl()
 	{
 		listOfEntitys = new ArrayList<>();
 		fileName = "out.txt";
+		gson = new GsonBuilder().create();
 	}
 
 	public DaoFileImpl(String fileName)
 	{
 		listOfEntitys = new ArrayList<>();
 		this.fileName = fileName;
+		gson = new GsonBuilder().create();
 
 	}
 
 	@Override
 	public void delete(DataModel<T> entity)
 	{
-
 		listOfEntitys.clear();
-		DataModel<T> tempModel;
 
-		try
-		{
-			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		try {
+			inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-			boolean control = true;
-
-			while(control)
+		boolean cont = true;
+		String inputJson;
+		DataModel inputData;
+		try {
+			while(cont)
 			{
-				tempModel = (DataModel<T>) inputStream.readObject();
-				if(tempModel != null)
+				inputJson = (String) inputStream.readObject();
+				if (inputJson != null)
 				{
-					listOfEntitys.add(tempModel);
-				}else
-				{
-					control = false;
+					inputData = gson.fromJson(inputJson, DataModel.class);
+					listOfEntitys.add(inputData);
+				} else {
+					cont = false;
 				}
-
 			}
-
-			listOfEntitys.remove(entity);
-
-			ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
-
-			for(DataModel t: listOfEntitys)
-			{
-				outputStream.writeObject(t);
-			}
-
-
-
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
+		boolean remove = false;
+
+		for(DataModel model: listOfEntitys)
+		{
+			if(model.getId() == entity.getId())
+			{
+				remove = listOfEntitys.remove(model);
+				break;
+			}
+		}
+
+		if (remove)
+		{
+			try {
+				outputStream = new ObjectOutputStream(new FileOutputStream(fileName, false));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			for(DataModel model: listOfEntitys)
+			{
+				String jsonString = gson.toJson(model);
+				try {
+					outputStream.writeObject(jsonString);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
 	}
 
 	@Override
 	public DataModel<T> find(Long id)
 	{
-		DataModel <T> tempEntity;
-		DataModel <T> returnEntity = null;
-		try
-		{
-			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		DataModel resutlData = null;
+		listOfEntitys.clear();
 
-			boolean control = true;
-			while(control)
+		try {
+			inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		boolean cont = true;
+		String inputJson;
+		DataModel inputData;
+		try {
+			while(cont)
 			{
-				DataModel<T> readObject = (DataModel<T>) inputStream.readObject();
-				tempEntity = readObject;
-				if(tempEntity != null)
+				inputJson = (String) inputStream.readObject();
+				if (inputJson != null)
 				{
-					listOfEntitys.add(tempEntity);
-				}else
-				{
-					control = false;
+					inputData = gson.fromJson(inputJson, DataModel.class);
+					listOfEntitys.add(inputData);
+				} else {
+					cont = false;
 				}
-
 			}
-
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
-		for(DataModel t: listOfEntitys)
+		for(DataModel model: listOfEntitys)
 		{
-			if(t.getId() == id)
+			if(model.getId() == id)
 			{
-				returnEntity = t;
+				resutlData = model;
 			}
 		}
 
-
-		return returnEntity;
+		return resutlData;
 	}
 
 	@Override
 	public void save(DataModel<T> entity)
 	{
+		listOfEntitys.clear();
 
 		try {
-			ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName,true));
-
-			outputStream.writeObject(entity);
-
-			outputStream.close();
-
-		} catch (IOException e)
-		{
+			inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+		//File Not exists, enter first element
+		if(inputStream == null)
+		{
+			try {
+				outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
+
+				String s = gson.toJson(entity);
+				outputStream.writeObject(s);
+
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}else
+			//The file is contain some data... we download all the data,
+			// add another line and
+			//rewrite all of it to the file
+		{
+			listOfEntitys.clear();
+
+			boolean cont = true;
+			String inputJson;
+			DataModel inputData;
+			try {
+				while(cont)
+				{
+					inputJson = (String) inputStream.readObject();
+					if(inputJson != null)
+					{
+						inputData = gson.fromJson(inputJson,DataModel.class);
+						listOfEntitys.add(inputData);
+					}else
+					{
+						cont = false;
+					}
+				}
+
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			listOfEntitys.add(entity);
+
+			try
+			{
+				File file = new File(fileName);
+				file.delete();
+				outputStream = new ObjectOutputStream(new FileOutputStream(fileName,false));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			for (DataModel dataModel: listOfEntitys)
+			{
+				String tempString = gson.toJson(dataModel);
+				try {
+					outputStream.writeObject(tempString);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+
+			}
+
+		}
+
+		closeStreams();
 	}
+
+	public void openStreams()
+	{
+		try {
+			outputStream = new ObjectOutputStream(new FileOutputStream(fileName,true));
+			inputStream = new ObjectInputStream(new FileInputStream(fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void closeStreams()
+	{
+		try {
+			outputStream.close();
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 
 
