@@ -27,8 +27,39 @@ public class CacheUnitTest
     @Test
     public void getDataModels()
     {
+        LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
+        DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
+
+        CacheUnit<Integer> cacheUnit = new CacheUnit(lru, daoFile);
+
+        for (int i = 0; i < 27; i++)
+        {
+            lru.putElement(Long.valueOf(i),new DataModel(Long.valueOf(i),i));
+        }
+
+        for (int i = 100; i < 150; i++)
+        {
+            int integer = i;
+           //daoFile.save(new DataModel(Long.valueOf(i), integer));
+        }
 
 
+        Long[] ids = {Long.valueOf(19),Long.valueOf(20),Long.valueOf(110),Long.valueOf(101)};
+        DataModel<Integer>[] dataModels = null;
+
+        try
+        {
+            dataModels = cacheUnit.getDataModels(ids);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (DataModel model: dataModels)
+        {
+            System.out.println(model.getId() + " "+model.getContent());
+        }
     }
 
     @Test

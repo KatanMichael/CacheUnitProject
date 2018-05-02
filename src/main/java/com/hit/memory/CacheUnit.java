@@ -20,7 +20,6 @@ public class CacheUnit <T>
 
 		
 	}
-	
 
 	DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
 	{
@@ -55,22 +54,25 @@ public class CacheUnit <T>
 		}
 
 
-		for(Long id: arrayIds)
+		for (int i = 0; i < arrayIds.size(); i++)
 		{
+			Long id = arrayIds.get(i);
 			DataModel<T> tempData;
 			tempData = (DataModel<T>) dao.find(id);
 
-			if(tempData != null)
-			{
-				dao.delete(id);
+			if (tempData != null) {
+				dao.delete(tempData);
 				listOfEntitys.add(tempData);
-				arrayIds.remove(id);
+				removeId.add(id);
 			}
 
-			DataModel resultObject = (DataModel) algoCache.putElement(tempData.getId(), tempData);
+			DataModel resultObject = null;
 
-			if(resultObject != null)
+			if(tempData != null)
 			{
+				resultObject = (DataModel) algoCache.putElement(tempData.getId(), tempData);
+			}
+			if (resultObject != null) {
 				dao.save(resultObject);
 			}
 
