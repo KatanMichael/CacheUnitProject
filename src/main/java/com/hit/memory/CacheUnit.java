@@ -37,7 +37,7 @@ public class CacheUnit <T>
 		}
 
 
-		for(int i =0; i < arrayIds.size(); i++)
+		for(int i = 0; i < arrayIds.size(); i++)
 		{
 			entity = (DataModel<T>) algoCache.getElement(arrayIds.get(i));
 
