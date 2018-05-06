@@ -27,6 +27,10 @@ public class CacheUnitTest
     @Test
     public void getDataModels()
     {
+
+        long startTime, endTime;
+
+        startTime = System.currentTimeMillis ();
         LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
         DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
 
@@ -40,7 +44,7 @@ public class CacheUnitTest
         for (int i = 0; i < 150; i++)
         {
             int integer = i;
-           //daoFile.save(new DataModel(Long.valueOf(i), integer));
+           daoFile.save(new DataModel(Long.valueOf(i), integer));
         }
 
 
@@ -61,28 +65,9 @@ public class CacheUnitTest
             System.out.println(model.getId() + " "+model.getContent());
         }
 
-        Long[] ids1 = {Long.valueOf(19),Long.valueOf(20),Long.valueOf(110),Long.valueOf(101)};
-        DataModel<Integer>[] dataModels1 = null;
+        endTime = System.currentTimeMillis ();
 
-        try
-        {
-            dataModels1 = cacheUnit.getDataModels(ids1);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (DataModel model: dataModels1)
-        {
-            System.out.println(model.getId() + " "+model.getContent());
-        }
-
+        System.out.println (endTime - startTime);
     }
 
-    @Test
-    public void justTesting()
-    {
-
-    }
 }
