@@ -21,7 +21,7 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 	{
 		listOfEntitys = new ArrayList<>();
 		fileName = "out.txt";
-		gson = new GsonBuilder().create();
+		gson = new GsonBuilder().create();;
 	}
 
 	public DaoFileImpl(String fileName)
@@ -114,7 +114,9 @@ public class DaoFileImpl <T> implements IDao<java.lang.Long,DataModel<T>>
 		try {
 			while(cont)
 			{
+
 				inputJson = (String) inputStream.readObject();
+
 				if (inputJson != null)
 				{
 					inputData = gson.fromJson(inputJson, DataModel.class);

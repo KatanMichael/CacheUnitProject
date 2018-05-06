@@ -34,10 +34,10 @@ public class CacheUnitTest
 
         for (int i = 0; i < 27; i++)
         {
-            lru.putElement(Long.valueOf(i),new DataModel(Long.valueOf(i),i));
+            //lru.putElement(Long.valueOf(i),new DataModel(Long.valueOf(i),i));
         }
 
-        for (int i = 100; i < 150; i++)
+        for (int i = 0; i < 150; i++)
         {
             int integer = i;
            //daoFile.save(new DataModel(Long.valueOf(i), integer));
@@ -60,6 +60,24 @@ public class CacheUnitTest
         {
             System.out.println(model.getId() + " "+model.getContent());
         }
+
+        Long[] ids1 = {Long.valueOf(19),Long.valueOf(20),Long.valueOf(110),Long.valueOf(101)};
+        DataModel<Integer>[] dataModels1 = null;
+
+        try
+        {
+            dataModels1 = cacheUnit.getDataModels(ids1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (DataModel model: dataModels1)
+        {
+            System.out.println(model.getId() + " "+model.getContent());
+        }
+
     }
 
     @Test
