@@ -10,24 +10,49 @@ import java.io.IOException;
 public class CacheUnitService<T>
 {
 
-    CacheUnit cacheUnit;
+    private CacheUnit cacheUnit;
 
     public CacheUnitService()
     {
         LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
         DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
 
+        this.cacheUnit = new CacheUnit (lru,daoFile);
+
         for (int i = 0; i < 150; i++)
         {
             int integer = i;
-            daoFile.save(new DataModel(Long.valueOf(i), integer));
+           // daoFile.save(new DataModel(Long.valueOf(i), integer));
         }
-
-        this.cacheUnit = new CacheUnit (lru,daoFile);
     }
 
     public boolean delete(DataModel<T>[] dataModels)
     {
+
+        DataModel[] returnModels = null;
+        Long[] ids = new Long[dataModels.length];
+
+        for (int i = 0; i <dataModels.length ; i++)
+        {
+            ids[i] = dataModels[i].getId ();
+        }
+
+        try
+        {
+            returnModels = cacheUnit.getDataModels (ids);
+        } catch (ClassNotFoundException e)
+        {
+            e.printStackTrace ();
+        } catch (IOException e)
+        {
+            e.printStackTrace ();
+        }
+
+        for(DataModel model: returnModels)
+        {
+            model.setContent (null);
+        }
+
 
 
         return true;
@@ -36,8 +61,36 @@ public class CacheUnitService<T>
     public boolean update(DataModel<T>[] dataModels)
     {
 
-        //TODO add code
+        DataModel[] returnModels = null;
+        Long[] ids = new Long[dataModels.length];
 
+        for (int i = 0; i <dataModels.length ; i++)
+        {
+            ids[i] = dataModels[i].getId ();
+        }
+
+        try
+        {
+            returnModels = cacheUnit.getDataModels (ids);
+        } catch (ClassNotFoundException e)
+        {
+            e.printStackTrace ();
+        } catch (IOException e)
+        {
+            e.printStackTrace ();
+        }
+
+        for (int i = 0; i <dataModels.length ; i++)
+        {
+            for (int j = 0; j <returnModels.length ; j++)
+            {
+                if(dataModels[i].getId () == returnModels[j].getId ())
+                {
+                    returnModels[j].setContent (dataModels[i].getContent ());
+                    j = returnModels.length+1;
+                }
+            }
+        }
         return true;
     }
 

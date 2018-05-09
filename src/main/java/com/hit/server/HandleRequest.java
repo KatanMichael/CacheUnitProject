@@ -2,15 +2,15 @@ package com.hit.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.hit.dm.DataModel;
 import com.hit.services.CacheUnitController;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Map;
 
 public class HandleRequest<T> implements Runnable
@@ -19,12 +19,15 @@ public class HandleRequest<T> implements Runnable
     Socket socket;
     CacheUnitController unitController;
 
-    Request socketRequest;
+    Request<DataModel<T>[]> socketRequest;
 
     ObjectInputStream inputStream;
     ObjectOutputStream outputStream;
 
     Gson gson;
+
+    Type ref;
+
 
     public HandleRequest(Socket s, CacheUnitController controller)
     {
@@ -48,21 +51,22 @@ public class HandleRequest<T> implements Runnable
     @Override
     public void run()
     {
+        writeToOutputStream ("Entering Run Method");
+
 
         String inputString;
 
+        DataModel[] model = null;
         String command;
-        DataModel[] model;
-
+        DataModel<T>[] body;
         try
         {
+            ref = new TypeToken<Request<DataModel<T>[]>> (){}.getType();
+
             inputString = (String) inputStream.readObject ();
-            System.out.println (inputString);
-            outputStream.writeObject (inputString);
 
-            socketRequest = gson.fromJson (inputString,Request.class);
+            socketRequest = new Gson().fromJson(inputString, ref);
 
-            System.out.println (socketRequest);
         } catch (IOException e)
         {
             e.printStackTrace ();
@@ -71,40 +75,34 @@ public class HandleRequest<T> implements Runnable
             e.printStackTrace ();
         }
 
-        try
-        {
-            outputStream.writeObject ("Hello!");
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
+        Map headers = socketRequest.getHeaders ();
 
-        ArrayList list = (ArrayList) socketRequest.getBody ();
+        command = (String) headers.get ("action");
 
-        model = (DataModel[]) list.toArray ();
+        body = socketRequest.getBody ();
 
-        command = (String) socketRequest.getHeaders().get ("action");
 
         if(command.equals ("GET"))
         {
 
-            DataModel[] dataModels = unitController.get (model);
+            unitController.get (body);
 
         }else if(command.equals ("DELETE"))
         {
 
-            boolean delete = unitController.delete (model);
+            unitController.delete (body);
 
         }else if(command.equals ("UPDATE"))
         {
-            boolean update = unitController.update (model);
 
+            unitController.update (body);
 
         }else
         {
             try
             {
-                outputStream.writeObject ("Unkown Action");
+                outputStream.writeObject ("Unknown Action");
+                outputStream.flush ();
             } catch (IOException e)
             {
                 e.printStackTrace ();
@@ -113,5 +111,17 @@ public class HandleRequest<T> implements Runnable
 
 
 
+    }
+
+
+    private void writeToOutputStream(String s)
+    {
+        try
+        {
+            outputStream.writeObject (s);
+        } catch (IOException e)
+        {
+            e.printStackTrace ();
+        }
     }
 }

@@ -42,7 +42,7 @@ public class CacheUnitTest
         for (int i = 0; i < 150; i++)
         {
             int integer = i;
-           daoFile.save(new DataModel(Long.valueOf(i), integer));
+           //daoFile.save(new DataModel(Long.valueOf(i), integer));
         }
 
 

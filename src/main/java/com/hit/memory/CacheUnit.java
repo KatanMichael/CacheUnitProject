@@ -86,7 +86,6 @@ public class CacheUnit <T>
 			arrOfDataModels[i] = listOfEntitys.get(i);
 		}
 
-
 		return arrOfDataModels;
 
 	}

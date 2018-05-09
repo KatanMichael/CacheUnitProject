@@ -7,14 +7,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements Observer
 {
     private ServerSocket socket;
     private boolean serverIsRunning;
+    private boolean startCommand = false;
     CacheUnitController unitController;
     Executor threadPool;
 
@@ -22,7 +23,7 @@ public class Server implements Observer
     public Server()
     {
         unitController = new CacheUnitController ();
-        threadPool = Executors.newCachedThreadPool ();
+        threadPool = Executors.newFixedThreadPool (2);
     }
 
 
@@ -58,6 +59,7 @@ public class Server implements Observer
 
         }
 
+        ((ExecutorService )threadPool).shutdown();
 
     }
 

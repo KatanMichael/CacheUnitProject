@@ -19,4 +19,14 @@ public class DataModel <T> implements java.io.Serializable
 		return content;
 	}
 
+	public void setContent(T content)
+	{
+		this.content = content;
+	}
+
+	public void setDataModelId(java.lang.Long id)
+	{
+		this.id = id;
+	}
+
 }
