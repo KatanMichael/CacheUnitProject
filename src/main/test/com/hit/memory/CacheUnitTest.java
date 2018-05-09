@@ -28,9 +28,7 @@ public class CacheUnitTest
     public void getDataModels()
     {
 
-        long startTime, endTime;
 
-        startTime = System.currentTimeMillis ();
         LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
         DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
 
@@ -65,9 +63,7 @@ public class CacheUnitTest
             System.out.println(model.getId() + " "+model.getContent());
         }
 
-        endTime = System.currentTimeMillis ();
 
-        System.out.println (endTime - startTime);
     }
 
 }

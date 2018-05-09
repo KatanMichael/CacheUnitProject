@@ -74,7 +74,15 @@ public class Server implements Observer
 
         }else
         {
+            System.out.println ("Shutdown In Here");
             serverIsRunning = false;
+            try
+            {
+                socket.close ();
+            } catch (IOException e)
+            {
+                e.printStackTrace ();
+            }
             System.out.println ("Shutdown Server...");
         }
 

@@ -29,22 +29,27 @@ public class CLI extends Observable implements Runnable
 
         while(true)
         {
+            printStream.println ("Please Enter Your Command: ");
             command = scanner.nextLine ();
+
+            //command = "Start";
 
             if(command.equals ("Start"))
             {
                 setChanged ();
                 notifyObservers ("Start");
 
-            }else if(command.equals ("Shutdown"))
+            }
+            if(command.equals ("Shutdown"))
             {
                 setChanged ();
                 notifyObservers ("Shutdown");
 
             }else
             {
-                printStream.println ("Unknows Command");
+                printStream.println ("Unknown Command");
             }
+
 
         }
     }

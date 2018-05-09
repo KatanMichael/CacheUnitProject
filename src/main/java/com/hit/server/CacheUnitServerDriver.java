@@ -9,7 +9,9 @@ public class CacheUnitServerDriver
         CLI cli = new CLI(System.in, System.out);
         Server server = new Server();
         cli.addObserver(server);
-        new Thread(cli).start();
+        Thread thread = new Thread (cli);
+
+        thread.start ();
 
     }
 

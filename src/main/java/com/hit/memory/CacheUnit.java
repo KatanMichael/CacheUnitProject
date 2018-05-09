@@ -21,7 +21,7 @@ public class CacheUnit <T>
 		
 	}
 
-	DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
+	public DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
 	{
 
 		ArrayList<DataModel<T>> listOfEntitys = new ArrayList<>();

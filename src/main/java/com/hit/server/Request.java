@@ -6,25 +6,25 @@ import java.util.Map;
 
 public class Request<T> implements Serializable
 {
-    Map<String,String> hashtable;
+    Map<String,String> header;
     T body;
 
     public Request(java.util.Map<java.lang.String,java.lang.String> headers,
                    T body)
     {
-        this.hashtable = headers;
+        this.header = headers;
         this.body = body;
 
     }
 
-    public Map<String, String> getHashtable()
+    public Map<String, String> getHeaders()
     {
-        return hashtable;
+        return header;
     }
 
-    public void setHashtable(Map<String, String> hashtable)
+    public void setHeaders(Map<String, String> hashtable)
     {
-        this.hashtable = hashtable;
+        this.header = hashtable;
     }
 
     public T getBody()

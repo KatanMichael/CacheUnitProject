@@ -4,33 +4,25 @@ import com.hit.dm.DataModel;
 
 public class CacheUnitController<T>
 {
+    CacheUnitService unitService;
 
     public CacheUnitController()
     {
-
-
+        unitService = new CacheUnitService ();
     }
 
     public boolean delete(DataModel<T>[] dataModels)
     {
-        //TODO add code
-
-        return true;
+        return unitService.delete (dataModels);
     }
 
     public boolean update(DataModel<T>[] dataModels)
     {
-
-        //TODO add code
-
-        return true;
+        return unitService.update (dataModels);
     }
 
     public DataModel<T>[] get(DataModel<T>[] dataModels)
     {
-
-        //TODO Add code
-
-        return null;
+        return unitService.get (dataModels);
     }
 }
