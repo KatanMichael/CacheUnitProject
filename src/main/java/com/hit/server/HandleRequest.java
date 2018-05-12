@@ -51,9 +51,6 @@ public class HandleRequest<T> implements Runnable
     @Override
     public void run()
     {
-        writeToOutputStream ("Entering Run Method");
-
-
         String inputString;
 
         DataModel[] model = null;
@@ -85,17 +82,46 @@ public class HandleRequest<T> implements Runnable
         if(command.equals ("GET"))
         {
 
-            unitController.get (body);
+            DataModel[] dataModels = unitController.get (body);
+
+            for(DataModel dataModel: dataModels)
+            {
+                try
+                {
+                    String outputGson = gson.toJson (dataModel);
+                    outputStream.writeObject (outputGson);
+                } catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+            }
+
 
         }else if(command.equals ("DELETE"))
         {
 
-            unitController.delete (body);
+            boolean delete = unitController.delete (body);
+
+            try
+            {
+                outputStream.writeObject (delete);
+            } catch (IOException e)
+            {
+                e.printStackTrace ();
+            }
 
         }else if(command.equals ("UPDATE"))
         {
 
-            unitController.update (body);
+            boolean update = unitController.update (body);
+
+            try
+            {
+                outputStream.writeObject (update);
+            } catch (IOException e)
+            {
+                e.printStackTrace ();
+            }
 
         }else
         {

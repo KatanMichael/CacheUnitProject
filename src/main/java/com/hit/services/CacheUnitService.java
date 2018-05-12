@@ -21,8 +21,8 @@ public class CacheUnitService<T>
 
         for (int i = 0; i < 150; i++)
         {
-            int integer = i;
-           // daoFile.save(new DataModel(Long.valueOf(i), integer));
+            Integer integer = i;
+           //daoFile.save(new DataModel(Long.valueOf(i), integer));
         }
     }
 
@@ -84,7 +84,7 @@ public class CacheUnitService<T>
         {
             for (int j = 0; j <returnModels.length ; j++)
             {
-                if(dataModels[i].getId () == returnModels[j].getId ())
+                if(dataModels[i].getId ().equals (returnModels[j].getId ()))
                 {
                     returnModels[j].setContent (dataModels[i].getContent ());
                     j = returnModels.length+1;

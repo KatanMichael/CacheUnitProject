@@ -61,7 +61,7 @@ public class CacheUnit <T>
 			tempData = (DataModel<T>) dao.find(id);
 
 			if (tempData != null) {
-				dao.delete(tempData);
+				//dao.delete(tempData);
 				listOfEntitys.add(tempData);
 				removeId.add(id);
 			}
