@@ -5,6 +5,7 @@ import com.hit.dao.DaoFileImpl;
 import com.hit.dm.DataModel;
 import com.hit.memory.CacheUnit;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 
 public class CacheUnitService<T>
@@ -14,8 +15,8 @@ public class CacheUnitService<T>
 
     public CacheUnitService()
     {
-        LRUAlgoCacheImpl<Long, DataModel<Integer>> lru = new LRUAlgoCacheImpl<>(25);
-        DaoFileImpl<Integer> daoFile = new DaoFileImpl<>("out.txt");
+        LRUAlgoCacheImpl<T, DataModel<T>> lru = new LRUAlgoCacheImpl<>(25);
+        DaoFileImpl<T> daoFile = new DaoFileImpl<>("out.txt");
 
         this.cacheUnit = new CacheUnit (lru,daoFile);
 
@@ -90,6 +91,10 @@ public class CacheUnitService<T>
                     j = returnModels.length+1;
                 }
             }
+        }
+        for(DataModel model: dataModels)
+        {
+            cacheUnit.updateFile (model);
         }
         return true;
     }

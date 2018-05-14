@@ -17,8 +17,6 @@ public class CacheUnit <T>
 	{
 		this.algoCache = algo;
 		this.dao = dao;
-
-		
 	}
 
 	public DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
@@ -90,5 +88,9 @@ public class CacheUnit <T>
 
 	}
 
+	public void updateFile(DataModel model)
+	{
+		dao.save (model);
+	}
 
 }
