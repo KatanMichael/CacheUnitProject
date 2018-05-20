@@ -7,6 +7,7 @@ import com.hit.memory.CacheUnit;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.lang.reflect.Array;
 
 public class CacheUnitService<T>
 {
@@ -24,6 +25,8 @@ public class CacheUnitService<T>
         {
             Integer integer = i;
             char c = (char)i;
+
+            //uncheck only if new file or file is empty
            //daoFile.save(new DataModel(Long.valueOf(i), c));
         }
     }
@@ -31,6 +34,7 @@ public class CacheUnitService<T>
     public boolean delete(DataModel<T>[] dataModels)
     {
 
+        boolean returnBool = false;
         DataModel[] returnModels = null;
         Long[] ids = new Long[dataModels.length];
 
@@ -55,14 +59,19 @@ public class CacheUnitService<T>
             model.setContent (null);
         }
 
+        if(returnModels.length > 0)
+        {
+            returnBool = true;
+        }
 
 
-        return true;
+        return returnBool;
     }
 
     public boolean update(DataModel<T>[] dataModels)
     {
 
+        boolean returnBool = false;
         DataModel[] returnModels = null;
         Long[] ids = new Long[dataModels.length];
 
@@ -93,11 +102,18 @@ public class CacheUnitService<T>
                 }
             }
         }
+
         for(DataModel model: dataModels)
         {
             cacheUnit.updateFile (model);
         }
-        return true;
+
+        if(dataModels.length > 0)
+        {
+            returnBool = true;
+        }
+
+        return returnBool;
     }
 
     public DataModel<T>[] get(DataModel<T>[] dataModels)

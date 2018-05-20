@@ -6,12 +6,11 @@ import com.google.gson.reflect.TypeToken;
 import com.hit.dm.DataModel;
 import com.hit.services.CacheUnitController;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.Map;
+import java.util.Scanner;
 
 public class HandleRequest<T> implements Runnable
 {
@@ -37,38 +36,35 @@ public class HandleRequest<T> implements Runnable
     @Override
     public void run()
     {
-        ObjectInputStream inputStream = null;
-        ObjectOutputStream outputStream = null;
+        Scanner inputStream = null;
+        PrintWriter outputStream = null;
 
         gson = new GsonBuilder ().create ();
+
         try
         {
-            inputStream = new ObjectInputStream (socket.getInputStream ());
-            outputStream = new ObjectOutputStream (socket.getOutputStream ());
+            inputStream = new Scanner (new InputStreamReader (socket.getInputStream ()));
+            outputStream = new PrintWriter (new OutputStreamWriter (socket.getOutputStream ()));
+            inputStream = new Scanner (new InputStreamReader (socket.getInputStream ()));
         } catch (IOException e)
         {
             e.printStackTrace ();
         }
+
+
         String inputString;
 
         DataModel[] model = null;
         String command;
         DataModel<T>[] body;
-        try
-        {
-            ref = new TypeToken<Request<DataModel<T>[]>> (){}.getType();
 
-            inputString = (String) inputStream.readObject ();
+        ref = new TypeToken<Request<DataModel<T>[]>> (){}.getType();
 
-            socketRequest = new Gson().fromJson(inputString, ref);
+        inputString = null;
 
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        } catch (ClassNotFoundException e)
-        {
-            e.printStackTrace ();
-        }
+        System.out.println (inputStream.next ());
+
+        socketRequest = new Gson().fromJson(inputString, ref);
 
         Map headers = socketRequest.getHeaders ();
 
@@ -83,66 +79,35 @@ public class HandleRequest<T> implements Runnable
             DataModel[] dataModels = unitController.get (body);
 
             String gsonString = gson.toJson (dataModels);
-            try
-            {
-                outputStream.writeObject (gsonString);
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
+
+            outputStream.write (gsonString);
+            outputStream.flush ();
 
         }else if(command.equals ("DELETE"))
         {
 
             boolean delete = unitController.delete (body);
 
-            try
-            {
-                outputStream.writeObject (delete);
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
+            outputStream.write (String.valueOf (delete));
+            outputStream.flush ();
 
         }else if(command.equals ("UPDATE"))
         {
 
             boolean update = unitController.update (body);
 
-            try
-            {
-                outputStream.writeObject (update);
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
+            outputStream.write (String.valueOf (update));
+            outputStream.flush ();
 
         }else
         {
-            try
-            {
-                outputStream.writeObject ("Unknown Action");
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
+            outputStream.write ("Unknown Action");
+            outputStream.flush ();
+
         }
 
-
-        try
-        {
-            outputStream.close ();
-            inputStream.close ();
-
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
-
+        outputStream.close ();
+        inputStream.close ();
     }
 
 }
