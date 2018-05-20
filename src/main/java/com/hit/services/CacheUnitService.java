@@ -23,7 +23,8 @@ public class CacheUnitService<T>
         for (int i = 0; i < 150; i++)
         {
             Integer integer = i;
-           //daoFile.save(new DataModel(Long.valueOf(i), integer));
+            char c = (char)i;
+           //daoFile.save(new DataModel(Long.valueOf(i), c));
         }
     }
 

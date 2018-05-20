@@ -21,9 +21,6 @@ public class HandleRequest<T> implements Runnable
 
     Request<DataModel<T>[]> socketRequest;
 
-    ObjectInputStream inputStream;
-    ObjectOutputStream outputStream;
-
     Gson gson;
 
     Type ref;
@@ -34,6 +31,16 @@ public class HandleRequest<T> implements Runnable
         this.socket = s;
         this.unitController = controller;
 
+    }
+
+
+    @Override
+    public void run()
+    {
+        ObjectInputStream inputStream = null;
+        ObjectOutputStream outputStream = null;
+
+        gson = new GsonBuilder ().create ();
         try
         {
             inputStream = new ObjectInputStream (socket.getInputStream ());
@@ -42,15 +49,6 @@ public class HandleRequest<T> implements Runnable
         {
             e.printStackTrace ();
         }
-
-        gson = new GsonBuilder ().create ();
-
-    }
-
-
-    @Override
-    public void run()
-    {
         String inputString;
 
         DataModel[] model = null;
@@ -84,18 +82,15 @@ public class HandleRequest<T> implements Runnable
 
             DataModel[] dataModels = unitController.get (body);
 
-            for(DataModel dataModel: dataModels)
+            String gsonString = gson.toJson (dataModels);
+            try
             {
-                try
-                {
-                    String outputGson = gson.toJson (dataModel);
-                    outputStream.writeObject (outputGson);
-                } catch (IOException e)
-                {
-                    e.printStackTrace ();
-                }
+                outputStream.writeObject (gsonString);
+                outputStream.flush ();
+            } catch (IOException e)
+            {
+                e.printStackTrace ();
             }
-
 
         }else if(command.equals ("DELETE"))
         {
@@ -105,6 +100,7 @@ public class HandleRequest<T> implements Runnable
             try
             {
                 outputStream.writeObject (delete);
+                outputStream.flush ();
             } catch (IOException e)
             {
                 e.printStackTrace ();
@@ -118,6 +114,7 @@ public class HandleRequest<T> implements Runnable
             try
             {
                 outputStream.writeObject (update);
+                outputStream.flush ();
             } catch (IOException e)
             {
                 e.printStackTrace ();
@@ -136,18 +133,16 @@ public class HandleRequest<T> implements Runnable
         }
 
 
-
-    }
-
-
-    private void writeToOutputStream(String s)
-    {
         try
         {
-            outputStream.writeObject (s);
+            outputStream.close ();
+            inputStream.close ();
+
         } catch (IOException e)
         {
             e.printStackTrace ();
         }
+
     }
+
 }

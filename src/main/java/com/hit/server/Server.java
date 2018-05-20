@@ -17,13 +17,13 @@ public class Server implements Observer
     private boolean serverIsRunning;
     private boolean startCommand = false;
     CacheUnitController unitController;
-    Executor threadPool;
+    ExecutorService threadPool;
 
 
     public Server()
     {
         unitController = new CacheUnitController ();
-        threadPool = Executors.newFixedThreadPool (2);
+        threadPool = Executors.newFixedThreadPool (20);
     }
 
 
@@ -54,12 +54,12 @@ public class Server implements Observer
             Thread thread = new Thread
                     (new HandleRequest(accept,unitController));
 
-            threadPool.execute (thread);
-
+            threadPool.submit (thread);
 
         }
+        threadPool.shutdown();
 
-        ((ExecutorService )threadPool).shutdown();
+
 
     }
 
