@@ -30,6 +30,7 @@ public class CacheUnitService<T>
 
     public boolean delete(DataModel<T>[] dataModels)
     {
+        boolean isDelete = false;
 
         DataModel[] returnModels = null;
         Long[] ids = new Long[dataModels.length];
@@ -55,13 +56,19 @@ public class CacheUnitService<T>
             model.setContent (null);
         }
 
+        if(returnModels.length > 0)
+        {
+            isDelete = true;
+        }
 
 
-        return true;
+        return isDelete;
     }
 
     public boolean update(DataModel<T>[] dataModels)
     {
+
+        boolean isUpdate = false;
 
         DataModel[] returnModels = null;
         Long[] ids = new Long[dataModels.length];
@@ -97,7 +104,13 @@ public class CacheUnitService<T>
         {
             cacheUnit.updateFile (model);
         }
-        return true;
+
+        if(dataModels.length > 0)
+        {
+            isUpdate = true;
+        }
+
+        return isUpdate;
     }
 
     public DataModel<T>[] get(DataModel<T>[] dataModels)

@@ -97,9 +97,11 @@ public class HandleRequest<T> implements Runnable
 
             boolean delete = unitController.delete (body);
 
+            String s = gson.toJson (delete);
+
             try
             {
-                outputStream.writeObject (delete);
+                outputStream.writeObject (s);
                 outputStream.flush ();
             } catch (IOException e)
             {
@@ -111,9 +113,11 @@ public class HandleRequest<T> implements Runnable
 
             boolean update = unitController.update (body);
 
+            String s = gson.toJson (update);
+
             try
             {
-                outputStream.writeObject (update);
+                outputStream.writeObject (s);
                 outputStream.flush ();
             } catch (IOException e)
             {
