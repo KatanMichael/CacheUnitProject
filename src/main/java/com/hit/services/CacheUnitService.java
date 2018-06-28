@@ -4,6 +4,7 @@ import com.hit.algorithm.LRUAlgoCacheImpl;
 import com.hit.dao.DaoFileImpl;
 import com.hit.dm.DataModel;
 import com.hit.memory.CacheUnit;
+import com.hit.util.DataStats;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
@@ -12,10 +13,16 @@ public class CacheUnitService<T>
 {
 
     private CacheUnit cacheUnit;
+    private DataStats dataStats;
+
 
     public CacheUnitService()
     {
+        dataStats = DataStats.getInstance ();
+
         LRUAlgoCacheImpl<T, DataModel<T>> lru = new LRUAlgoCacheImpl<>(25);
+        dataStats.setCacheAlgo ("LRU");
+        dataStats.setCapacity (25);
         DaoFileImpl<T> daoFile = new DaoFileImpl<>("out.txt");
 
         this.cacheUnit = new CacheUnit (lru,daoFile);
@@ -40,16 +47,7 @@ public class CacheUnitService<T>
             ids[i] = dataModels[i].getId ();
         }
 
-        try
-        {
-            returnModels = cacheUnit.getDataModels (ids);
-        } catch (ClassNotFoundException e)
-        {
-            e.printStackTrace ();
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
+        returnModels = cacheUnit.getDataModels (ids);
 
         for(DataModel model: returnModels)
         {
@@ -78,16 +76,7 @@ public class CacheUnitService<T>
             ids[i] = dataModels[i].getId ();
         }
 
-        try
-        {
-            returnModels = cacheUnit.getDataModels (ids);
-        } catch (ClassNotFoundException e)
-        {
-            e.printStackTrace ();
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
+        returnModels = cacheUnit.getDataModels (ids);
 
         for (int i = 0; i <dataModels.length ; i++)
         {
@@ -123,17 +112,7 @@ public class CacheUnitService<T>
             ids[i] = dataModels[i].getId ();
         }
 
-        try
-        {
-
-            models = cacheUnit.getDataModels (ids);
-        } catch (ClassNotFoundException e)
-        {
-            e.printStackTrace ();
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        }
+        models = cacheUnit.getDataModels (ids);
 
 
         return models;

@@ -49,14 +49,7 @@ public class CacheUnitTest
         Long[] ids = {Long.valueOf(19),Long.valueOf(20),Long.valueOf(110),Long.valueOf(101)};
         DataModel<Integer>[] dataModels = null;
 
-        try
-        {
-            dataModels = cacheUnit.getDataModels(ids);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        dataModels = cacheUnit.getDataModels(ids);
 
         for (DataModel model: dataModels)
         {

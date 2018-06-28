@@ -3,6 +3,7 @@ package com.hit.memory;
 import com.hit.algorithm.IAlgoCache;
 import com.hit.dao.IDao;
 import com.hit.dm.DataModel;
+import com.hit.util.DataStats;
 
 import java.util.ArrayList;
 
@@ -12,14 +13,18 @@ public class CacheUnit <T>
 	private IDao dao;
 	private IAlgoCache algoCache;
 
+	DataStats dataStats;
+
 	public CacheUnit(com.hit.algorithm.IAlgoCache<java.lang.Long,DataModel<T>> algo,
             IDao<java.io.Serializable,DataModel<T>> dao)
 	{
 		this.algoCache = algo;
 		this.dao = dao;
+
+		dataStats = DataStats.getInstance ();
 	}
 
-	public DataModel<T>[] getDataModels(java.lang.Long[] ids) throws java.lang.ClassNotFoundException, java.io.IOException
+	public DataModel<T>[] getDataModels(java.lang.Long[] ids)
 	{
 
 		ArrayList<DataModel<T>> listOfEntitys = new ArrayList<>();
@@ -32,6 +37,7 @@ public class CacheUnit <T>
 		for(Long l: ids)
 		{
 			arrayIds.add(l);
+			dataStats.addModelsRequest ();
 		}
 
 
@@ -70,8 +76,10 @@ public class CacheUnit <T>
 			{
 				resultObject = (DataModel) algoCache.putElement(tempData.getId(), tempData);
 			}
-			if (resultObject != null) {
+			if (resultObject != null)
+			{
 				dao.save(resultObject);
+				dataStats.addModelSwap ();
 			}
 
 		}

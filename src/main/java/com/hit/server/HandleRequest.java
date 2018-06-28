@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.hit.dm.DataModel;
 import com.hit.services.CacheUnitController;
+import com.hit.util.DataStats;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,20 +17,19 @@ import java.util.Map;
 public class HandleRequest<T> implements Runnable
 {
 
-    Socket socket;
-    CacheUnitController unitController;
+    private Socket socket;
+    private CacheUnitController unitController;
 
-    Request<DataModel<T>[]> socketRequest;
+    private Request<DataModel<T>[]> socketRequest;
 
-    Gson gson;
-
-    Type ref;
-
+    DataStats dataStats;
 
     public HandleRequest(Socket s, CacheUnitController controller)
     {
         this.socket = s;
         this.unitController = controller;
+
+        dataStats = DataStats.getInstance ();
 
     }
 
@@ -37,10 +37,11 @@ public class HandleRequest<T> implements Runnable
     @Override
     public void run()
     {
+        boolean statsRequest = false;
         ObjectInputStream inputStream = null;
         ObjectOutputStream outputStream = null;
 
-        gson = new GsonBuilder ().create ();
+        Gson gson = new GsonBuilder ().create ();
         try
         {
             inputStream = new ObjectInputStream (socket.getInputStream ());
@@ -54,82 +55,104 @@ public class HandleRequest<T> implements Runnable
         DataModel[] model = null;
         String command;
         DataModel<T>[] body;
+
         try
         {
-            ref = new TypeToken<Request<DataModel<T>[]>> (){}.getType();
+            Type ref = new TypeToken<Request<DataModel<T>[]>> ()
+            {
+            }.getType ();
 
             inputString = (String) inputStream.readObject ();
 
-            socketRequest = new Gson().fromJson(inputString, ref);
+            if(inputString.equals ("stats"))
+            {
+                statsRequest = true;
+            }else
+            {
+                socketRequest = new Gson().fromJson(inputString, ref);
+            }
 
-        } catch (IOException e)
-        {
-            e.printStackTrace ();
-        } catch (ClassNotFoundException e)
+        } catch (IOException | ClassNotFoundException e)
         {
             e.printStackTrace ();
         }
 
-        Map headers = socketRequest.getHeaders ();
 
-        command = (String) headers.get ("action");
-
-        body = socketRequest.getBody ();
-
-
-        if(command.equals ("GET"))
+        if(!statsRequest)
         {
+            Map headers = socketRequest.getHeaders ();
 
-            DataModel[] dataModels = unitController.get (body);
+            command = (String) headers.get ("action");
 
-            String gsonString = gson.toJson (dataModels);
-            try
+            body = socketRequest.getBody ();
+
+
+            if(command.equals ("GET"))
             {
-                outputStream.writeObject (gsonString);
-                outputStream.flush ();
-            } catch (IOException e)
+
+                DataModel[] dataModels = unitController.get (body);
+
+                String gsonString = gson.toJson (dataModels);
+                try
+                {
+                    outputStream.writeObject (gsonString);
+                    outputStream.flush ();
+                } catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+
+
+            }else if(command.equals ("DELETE"))
             {
-                e.printStackTrace ();
+
+                boolean delete = unitController.delete (body);
+
+                String s = gson.toJson (delete);
+
+                try
+                {
+                    outputStream.writeObject (s);
+                    outputStream.flush ();
+                } catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+
+            }else if(command.equals ("UPDATE"))
+            {
+
+                boolean update = unitController.update (body);
+
+                String s = gson.toJson (update);
+
+                try
+                {
+                    outputStream.writeObject (s);
+                    outputStream.flush ();
+                } catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+
+            }else
+            {
+                try
+                {
+                    outputStream.writeObject ("Unknown Action");
+                    outputStream.flush ();
+                } catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
             }
-
-        }else if(command.equals ("DELETE"))
-        {
-
-            boolean delete = unitController.delete (body);
-
-            String s = gson.toJson (delete);
-
-            try
-            {
-                outputStream.writeObject (s);
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
-
-        }else if(command.equals ("UPDATE"))
-        {
-
-            boolean update = unitController.update (body);
-
-            String s = gson.toJson (update);
-
-            try
-            {
-                outputStream.writeObject (s);
-                outputStream.flush ();
-            } catch (IOException e)
-            {
-                e.printStackTrace ();
-            }
-
         }else
         {
+            String jsonString = gson.toJson (dataStats);
             try
             {
-                outputStream.writeObject ("Unknown Action");
-                outputStream.flush ();
+
+                outputStream.writeObject (jsonString);
             } catch (IOException e)
             {
                 e.printStackTrace ();

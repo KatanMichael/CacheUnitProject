@@ -16,7 +16,7 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="CacheAlgoritm.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../CacheAlgoritm/classes/artifacts/CacheAlgoritm_jar/CacheAlgoritm.jar!/" />
