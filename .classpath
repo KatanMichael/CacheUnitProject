@@ -4,8 +4,8 @@
 	<classpathentry kind="src" path="src/main/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="C:/Users/MichaelKata/Desktop/School/gson-2.8.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/MichaelKata/Desktop/School/שנה ב/סמסטר ב&apos;/תכנות בסביבות האינטרנט/Jar Files/CacheAlgorithm.jar"/>
 	<classpathentry kind="src" path="/CacheAlgoritm"/>
+	<classpathentry kind="lib" path="src/lib/CacheAlgorithm.jar"/>
+	<classpathentry kind="lib" path="src/lib/gson-2.8.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
