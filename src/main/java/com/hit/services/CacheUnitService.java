@@ -20,19 +20,19 @@ public class CacheUnitService<T>
     {
         dataStats = DataStats.getInstance ();
 
-        LRUAlgoCacheImpl<T, DataModel<T>> lru = new LRUAlgoCacheImpl<>(25);
+        LRUAlgoCacheImpl<T, DataModel<T>> lru = new LRUAlgoCacheImpl<>(3);
         dataStats.setCacheAlgo ("LRU");
-        dataStats.setCapacity (25);
+        dataStats.setCapacity (3);
         DaoFileImpl<T> daoFile = new DaoFileImpl<>("out.txt");
 
         this.cacheUnit = new CacheUnit (lru,daoFile);
 
-        for (int i = 0; i < 150; i++)
-        {
-            Integer integer = i;
-            char c = (char)i;
-           //daoFile.save(new DataModel(Long.valueOf(i), c));
-        }
+//        for (int i = 0; i < 150; i++)
+//        {
+//            Integer integer = i;
+//            char c = (char) i;
+//            daoFile.save (new DataModel (Long.valueOf (i), c));
+//        }
     }
 
     public boolean delete(DataModel<T>[] dataModels)
